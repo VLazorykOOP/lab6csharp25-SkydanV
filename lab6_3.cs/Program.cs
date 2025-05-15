@@ -9,7 +9,8 @@ struct CarStruct
     public string Color;
 
     public CarStruct(string brand, int year, decimal price, string color)
-    {
+    {ban
+        if(brand=="" || Year <1900 && Year>2025 )  throw new CarArrayException("{f ");
         Brand = brand;
         Year = year;
         Price = price;
