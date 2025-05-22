@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 struct CarStruct
@@ -9,8 +9,10 @@ struct CarStruct
     public string Color;
 
     public CarStruct(string brand, int year, decimal price, string color)
-    {ban
-        if(brand=="" || Year <1900 && Year>2025 )  throw new CarArrayException("{f ");
+    {
+        if (string.IsNullOrWhiteSpace(brand) || year < 1900 || year > 2025)
+            throw new CarArrayException("Некоректні дані автомобіля: порожня марка або рік не в межах 1900–2025");
+
         Brand = brand;
         Year = year;
         Price = price;
@@ -20,6 +22,7 @@ struct CarStruct
     public void Show() =>
         Console.WriteLine($"[Struct] {Brand}, {Year}, {Price}$, {Color}");
 }
+
 public record CarRecord(string Brand, int Year, decimal Price, string Color);
 
 public class CarArrayException : Exception
@@ -33,15 +36,19 @@ class Program
     {
         try
         {
-            Console.WriteLine("Обери тип реалізації: ");
+            Console.WriteLine("Обери тип реалізації:");
             Console.WriteLine("1 - Struct");
             Console.WriteLine("2 - Tuple");
             Console.WriteLine("3 - Record");
-            Console.Write(" номер: ");
+            Console.Write("номер: ");
             var choice = Console.ReadLine();
 
-            Console.Write("\n мінімальний рік авто: ");
-            int minYear = int.Parse(Console.ReadLine());
+            Console.Write("мінімальний рік авто: ");
+            if (!int.TryParse(Console.ReadLine(), out int minYear))
+            {
+                Console.WriteLine("Введено некоректне значення. Встановлено 2010.");
+                minYear = 2010;
+            }
 
             switch (choice)
             {
@@ -55,31 +62,29 @@ class Program
                     UseRecord(minYear);
                     break;
                 default:
-                    Console.WriteLine("не той номер ");
+                    Console.WriteLine("Не той номер.");
                     break;
             }
 
             object[] carsArray = new string[3];
             carsArray[0] = "BMW";
             carsArray[1] = "Audi";
-            carsArray[2] = 1234; 
-
+            carsArray[2] = 1234; // ArrayTypeMismatchException
         }
         catch (ArrayTypeMismatchException ex)
         {
-            Console.WriteLine("\n[Стандартний виняток] ArrayTypeMismatchException зловлено:");
+            Console.WriteLine("[Стандартний виняток] ArrayTypeMismatchException зловлено:");
             Console.WriteLine(ex.Message);
-
-            throw new CarArrayException("Неможливо вставити елемент не того типу в масив автомобілів!");
+            throw new CarArrayException("Неможливо вставити елемент не того типу в масив автомобілів.");
         }
         catch (CarArrayException customEx)
         {
-            Console.WriteLine("\n[Власний виняток] CarArrayException:");
+            Console.WriteLine("[Власний виняток] CarArrayException:");
             Console.WriteLine(customEx.Message);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("\n[❗ Інша помилка]: " + ex.Message);
+            Console.WriteLine("[Інша помилка]: " + ex.Message);
         }
     }
 
@@ -96,7 +101,7 @@ class Program
         cars.RemoveAll(c => c.Year < minYear);
         cars.Insert(0, new CarStruct("Toyota", 2000, 13000, "Silver"));
 
-        Console.WriteLine("\nStruct cars ");
+        Console.WriteLine("Struct cars:");
         foreach (var car in cars)
             car.Show();
     }
@@ -114,7 +119,7 @@ class Program
         cars.RemoveAll(c => c.Year < minYear);
         cars.Insert(0, ("Toyota", 2000, 13000, "Silver"));
 
-        Console.WriteLine("\nTuple cars ");
+        Console.WriteLine("Tuple cars:");
         foreach (var car in cars)
             Console.WriteLine($"[Tuple] {car.Brand}, {car.Year}, {car.Price}$, {car.Color}");
     }
@@ -132,8 +137,9 @@ class Program
         cars.RemoveAll(c => c.Year < minYear);
         cars.Insert(0, new("Toyota", 2000, 13000, "Silver"));
 
-        Console.WriteLine("\nRecord cars ");
+        Console.WriteLine("Record cars:");
         foreach (var car in cars)
             Console.WriteLine($"[Record] {car.Brand}, {car.Year}, {car.Price}$, {car.Color}");
     }
 }
+
